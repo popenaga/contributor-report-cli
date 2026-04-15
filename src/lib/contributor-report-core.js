@@ -2,7 +2,14 @@ import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { calculateScores, LARGE_CHANGE_THRESHOLD, scoringMethodology } from './contributor-report-scoring.js'
+import {
+  calculateBaseScores,
+  calculateOverallScore,
+  calculateReviewFlowScore,
+  LARGE_CHANGE_THRESHOLD,
+  metricDefinitions,
+  scoringMethodology
+} from './contributor-report-scoring.js'
 
 const MAILMAP_PATTERN = /^(.*?) <([^>]+)> (.*?) <([^>]+)>$/
 const COMMIT_MARKER = '--COMMIT--'
@@ -66,7 +73,7 @@ export function aggregateContributors(commits, mailmap = new Map()) {
       name: canonicalIdentity.name,
       email: canonicalIdentity.email,
       commitCount: 0,
-      mergePrCount: 0,
+      mergeCommitPrCount: 0,
       added: 0,
       deleted: 0,
       filesTouchedSet: new Set(),
@@ -79,7 +86,7 @@ export function aggregateContributors(commits, mailmap = new Map()) {
     current.commitCount += 1
 
     if (/^Merge pull request #\d+/i.test(commit.subject)) {
-      current.mergePrCount += 1
+      current.mergeCommitPrCount += 1
     }
 
     let commitAdded = 0
@@ -120,13 +127,13 @@ export function aggregateContributors(commits, mailmap = new Map()) {
 
   return [...contributorMap.values()]
     .map((item) => {
-      const scores = calculateScores(item)
+      const scores = calculateBaseScores(item)
 
       return {
         name: item.name,
         email: item.email,
         commitCount: item.commitCount,
-        mergePrCount: item.mergePrCount,
+        mergeCommitPrCount: item.mergeCommitPrCount,
         added: item.added,
         deleted: item.deleted,
         filesTouched: scores.filesTouched,
@@ -135,9 +142,14 @@ export function aggregateContributors(commits, mailmap = new Map()) {
         featureCommitsWithoutTests: item.featureCommitsWithoutTests,
         largeChangeCommits: item.largeChangeCommits,
         testTouchRatio: scores.testTouchRatio,
-        throughputScore: scores.throughputScore,
-        qualityScore: scores.qualityScore,
-        overallScore: scores.overallScore
+        activityScore: scores.activityScore,
+        reviewFlowScore: null,
+        qualityProxyScore: scores.qualityProxyScore,
+        overallScore: calculateOverallScore({
+          activityScore: scores.activityScore,
+          reviewFlowScore: null,
+          qualityProxyScore: scores.qualityProxyScore
+        })
       }
     })
     .sort((left, right) => right.overallScore - left.overallScore || right.commitCount - left.commitCount)
@@ -175,12 +187,32 @@ export function enrichContributorsWithGitHubPrs(contributors, githubPrs = [], ma
 
       return {
         ...contributor,
-        githubPrCount: metrics?.githubPrCount ?? 0,
+        attributedMergedPullRequestCount: metrics?.githubPrCount ?? 0,
         githubReviewCommentCount: metrics?.githubReviewCommentCount ?? 0,
         githubConversationCommentCount: metrics?.githubConversationCommentCount ?? 0,
         avgLeadTimeHours: metrics?.githubPrCount
           ? Number((metrics.leadTimeHoursTotal / metrics.githubPrCount).toFixed(1))
-          : null
+          : null,
+        reviewFlowScore: calculateReviewFlowScore({
+          attributedMergedPullRequestCount: metrics?.githubPrCount ?? 0,
+          githubReviewCommentCount: metrics?.githubReviewCommentCount ?? 0,
+          githubConversationCommentCount: metrics?.githubConversationCommentCount ?? 0,
+          avgLeadTimeHours: metrics?.githubPrCount
+            ? Number((metrics.leadTimeHoursTotal / metrics.githubPrCount).toFixed(1))
+            : null
+        }),
+        overallScore: calculateOverallScore({
+          activityScore: contributor.activityScore,
+          reviewFlowScore: calculateReviewFlowScore({
+            attributedMergedPullRequestCount: metrics?.githubPrCount ?? 0,
+            githubReviewCommentCount: metrics?.githubReviewCommentCount ?? 0,
+            githubConversationCommentCount: metrics?.githubConversationCommentCount ?? 0,
+            avgLeadTimeHours: metrics?.githubPrCount
+              ? Number((metrics.leadTimeHoursTotal / metrics.githubPrCount).toFixed(1))
+              : null
+          }),
+          qualityProxyScore: contributor.qualityProxyScore
+        })
       }
     })
     .sort((left, right) => right.overallScore - left.overallScore || right.commitCount - left.commitCount)
@@ -271,6 +303,7 @@ export function collectContributorReportData({
     generatedAt,
     periodLabel: periodOptions.periodLabel,
     scoringMethodology,
+    metricDefinitions,
     contributors
   }
 }

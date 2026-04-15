@@ -100,11 +100,24 @@ By default the CLI writes outputs to `<repo>/contributor-reports/`.
 
 These files can contain personally identifiable or organization-specific metadata. Treat them as reviewable artifacts, not automatically safe-to-publish outputs.
 
-## How Code Quality Is Measured
+## How Big Tech Usually Evaluates Code Quality
 
-`qualityScore` is a heuristic, not a static-analysis result. The CLI currently uses only git history and test-file path heuristics, then clamps the final score to `0..100`.
+Large engineering organizations usually avoid judging code quality from one activity metric alone.
 
-Current quality formula:
+- Microsoft Research's [SPACE framework](https://www.microsoft.com/en-us/research/publication/the-space-of-developer-productivity-theres-more-to-it-than-you-think/) argues that developer productivity should be measured across multiple dimensions, not only output or activity.
+- Google's DORA program describes software delivery in terms of throughput and instability, and explicitly recommends smaller batches and shorter lead times as improvement levers: [DORA metrics guide](https://dora.dev/guides/dora-metrics/).
+- Google's engineering review guidance focuses on design, functionality, tests, and overall code health during review: [Google Engineering Practices](https://google.github.io/eng-practices/review/reviewer/looking-for.html).
+- GitHub Code Quality frames repository quality around [reliability and maintainability](https://docs.github.com/code-security/reference/code-quality/metrics-and-ratings), not raw commit volume.
+
+This CLI mirrors that direction by separating engineering signals into:
+
+- `Activity Score`: delivery volume and integration activity
+- `Review Flow Score`: merged PR participation, review discussion, and PR lead time
+- `Quality Proxy Score`: test touch signals, missing-test risk, and oversized-change risk
+
+`Quality Proxy Score` is still a heuristic, not a static-analysis or defect-density result. The CLI currently uses only git history and test-file path heuristics, then clamps the final proxy score to `0..100`.
+
+Current quality proxy formula:
 
 ```text
 60
@@ -126,10 +139,17 @@ Signals used today:
 Overall ranking is also explicit:
 
 ```text
-overallScore = throughputScore * 0.45 + qualityScore * 0.55
+overallScore = weighted average of activityScore, reviewFlowScore, and qualityProxyScore across available dimensions
 ```
 
-`throughputScore` is a separate delivery-volume heuristic based on commit count, churn, files touched, and inferred merge PR commits. Generated Markdown and JSON reports now include this methodology section so the score is inspectable at report time.
+If GitHub PR metadata is not supplied, `Review Flow Score` is omitted rather than treated as zero.
+
+## Metric Definitions
+
+- `Merge Commits (git)`: count of git commits whose subject matches `Merge pull request #...`. This mostly reflects merge-commit workflows and may stay at zero for squash/rebase repositories.
+- `Merged PRs (GitHub attributed)`: count of merged GitHub pull requests in the selected window when `--include-github` is enabled and the contributor is selected by dominant git author across commits in that PR.
+
+Generated Markdown and JSON reports include the methodology and these metric definitions directly so the score remains inspectable at report time.
 
 ## Publish
 
