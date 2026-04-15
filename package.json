@@ -1,6 +1,6 @@
 {
   "name": "contributor-report-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "Generic CLI for contributor throughput and code quality reports using git and optional GitHub PR metadata.",
   "type": "module",

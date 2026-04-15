@@ -11,11 +11,11 @@ Repository: https://github.com/popenaga/contributor-report-cli
 - npm publish has not been run yet
 
 <!-- release:managed:start -->
-Current package version: `0.1.0`
+Current package version: `0.1.1`
 
 Install the current release:
 ```bash
-npm install -g contributor-report-cli@0.1.0
+npm install -g contributor-report-cli@0.1.1
 ```
 
 Release flow:
