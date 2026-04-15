@@ -1,4 +1,5 @@
 node_modules/
 contributor-reports/
+docs/
 .DS_Store
 npm-debug.log*

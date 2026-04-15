@@ -8,7 +8,7 @@ Repository: https://github.com/popenaga/contributor-report-cli
 
 - npm package name `contributor-report-cli` is currently available
 - GitHub repository is public and connected
-- npm publish has not been run yet
+- npm package `contributor-report-cli@0.1.1` has been published successfully
 
 <!-- release:managed:start -->
 Current package version: `0.1.1`
@@ -23,6 +23,12 @@ Release flow:
 - merges to `main` open or update a release PR
 - merging the release PR updates npm and creates the GitHub release
 <!-- release:managed:end -->
+
+## Open Source Notes
+
+- Generated reports can include contributor names, email addresses, PR titles, and other repository-derived metadata.
+- Review generated output before sharing it outside your team or committing it to a repository.
+- This CLI is intended as an inspection aid, not as a sole basis for hiring, compensation, or performance decisions.
 
 ## Requirements
 
@@ -92,6 +98,8 @@ By default the CLI writes outputs to `<repo>/contributor-reports/`.
 - JSON report: `contributor-report-<date-or-range>.json`
 - GitHub metadata cache when enabled: `contributor-github-pr-metadata-<from>_<to>.json`
 
+These files can contain personally identifiable or organization-specific metadata. Treat them as reviewable artifacts, not automatically safe-to-publish outputs.
+
 ## How Code Quality Is Measured
 
 `qualityScore` is a heuristic, not a static-analysis result. The CLI currently uses only git history and test-file path heuristics, then clamps the final score to `0..100`.
@@ -137,3 +145,10 @@ Maintainers should not publish manually in the normal flow.
 - Required GitHub secret: `NPM_TOKEN`
 - Versioning, changelog generation, README sync, and publish are handled by `changesets`
 - Run `npm run release:check` locally before merging release-related changes
+- GitHub Actions repository workflow permissions must allow write access and pull request creation
+
+## Community
+
+- Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Security policy: [SECURITY.md](./SECURITY.md)
+- Code of conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
