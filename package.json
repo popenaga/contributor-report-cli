@@ -1,0 +1,43 @@
+{
+  "name": "contributor-report-cli",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Generic CLI for contributor throughput and code quality reports using git and optional GitHub PR metadata.",
+  "type": "module",
+  "bin": {
+    "contributor-report": "./bin/contributor-report.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "smoke": "node ./bin/contributor-report.js --help"
+  },
+  "keywords": [
+    "git",
+    "github",
+    "contributors",
+    "engineering-metrics",
+    "productivity",
+    "code-quality",
+    "report"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/popenaga/contributor-report-cli.git"
+  },
+  "homepage": "https://github.com/popenaga/contributor-report-cli#readme",
+  "bugs": {
+    "url": "https://github.com/popenaga/contributor-report-cli/issues"
+  },
+  "license": "MIT"
+}

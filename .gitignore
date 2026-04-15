@@ -1,0 +1,4 @@
+node_modules/
+contributor-reports/
+.DS_Store
+npm-debug.log*
