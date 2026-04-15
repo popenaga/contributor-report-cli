@@ -11,11 +11,11 @@ Repository: https://github.com/popenaga/contributor-report-cli
 - npm package `contributor-report-cli@0.1.1` has been published successfully
 
 <!-- release:managed:start -->
-Current package version: `0.1.1`
+Current package version: `0.1.2`
 
 Install the current release:
 ```bash
-npm install -g contributor-report-cli@0.1.1
+npm install -g contributor-report-cli@0.1.2
 ```
 
 Release flow:
