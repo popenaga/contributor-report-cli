@@ -12,9 +12,9 @@ export function buildReleaseReadmeBlock({ packageName, version }) {
     '```',
     '',
     'Release flow:',
-    '- feature PRs add a changeset',
-    '- merges to `main` open or update a release PR',
-    '- merging the release PR updates npm and creates the GitHub release',
+    '- every push to `main` creates the next patch release',
+    '- the workflow bumps `package.json` and README to the next version',
+    '- the workflow publishes to npm and creates the GitHub release',
     END_MARKER
   ].join('\n')
 }

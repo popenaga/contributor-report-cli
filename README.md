@@ -19,9 +19,9 @@ npm install -g contributor-report-cli@0.1.1
 ```
 
 Release flow:
-- feature PRs add a changeset
-- merges to `main` open or update a release PR
-- merging the release PR updates npm and creates the GitHub release
+- every push to `main` creates the next patch release
+- the workflow bumps `package.json` and README to the next version
+- the workflow publishes to npm and creates the GitHub release
 <!-- release:managed:end -->
 
 ## Open Source Notes
@@ -155,15 +155,14 @@ Generated Markdown and JSON reports include the methodology and these metric def
 
 Maintainers should not publish manually in the normal flow.
 
-1. Add a changeset in the feature PR
-2. Merge the PR into `main`
-3. Review and merge the release PR created by GitHub Actions
-4. GitHub Actions publishes to npm and creates the GitHub release
+1. Merge a change into `main`
+2. GitHub Actions bumps the patch version and commits it back to `main`
+3. The same workflow publishes to npm and creates the GitHub release
 
 ## Release Maintenance
 
 - Required GitHub secret: `NPM_TOKEN`
-- Versioning, changelog generation, README sync, and publish are handled by `changesets`
+- Version bumping, README sync, npm publish, and GitHub releases run automatically on every push to `main`
 - Run `npm run release:check` locally before merging release-related changes
 - GitHub Actions repository workflow permissions must allow write access and pull request creation
 

@@ -16,7 +16,6 @@ Thanks for contributing to `contributor-report-cli`.
 
 - Keep changes focused and reviewable.
 - Add or update tests when behavior changes.
-- Add a changeset for user-facing changes by running `npx changeset`.
 - Update documentation when CLI behavior, output, or release steps change.
 
 ## Generated Output
@@ -26,5 +25,5 @@ Thanks for contributing to `contributor-report-cli`.
 
 ## Release Notes
 
-- Changes merged to `main` should carry a changeset when they affect users.
-- The repository uses Changesets to open release PRs and publish to npm.
+- Every push to `main` creates the next patch release.
+- The release workflow bumps the version, syncs README, publishes to npm, and creates the GitHub release.

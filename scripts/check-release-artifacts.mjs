@@ -14,7 +14,3 @@ const expectedReadme = syncReleaseReadme(readme, {
 if (readme !== expectedReadme) {
   throw new Error('README managed release block is out of sync. Run `npm run release:readme`.')
 }
-
-if (!fs.existsSync(new URL('../.changeset/config.json', import.meta.url))) {
-  throw new Error('Missing .changeset/config.json')
-}

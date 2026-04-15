@@ -18,8 +18,7 @@
     "smoke": "node ./bin/contributor-report.js --help",
     "release:readme": "node ./scripts/update-readme-release.mjs",
     "release:check": "node ./scripts/check-release-artifacts.mjs",
-    "version-packages": "changeset version && npm run release:readme",
-    "release": "npm run release:check && changeset publish"
+    "release:bump": "node ./scripts/bump-release-version.mjs"
   },
   "keywords": [
     "git",
@@ -44,9 +43,5 @@
   "bugs": {
     "url": "https://github.com/popenaga/contributor-report-cli/issues"
   },
-  "license": "MIT",
-  "devDependencies": {
-    "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.5"
-  }
+  "license": "MIT"
 }
