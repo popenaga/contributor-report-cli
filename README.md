@@ -10,6 +10,20 @@ Repository: https://github.com/popenaga/contributor-report-cli
 - GitHub repository is public and connected
 - npm publish has not been run yet
 
+<!-- release:managed:start -->
+Current package version: `0.1.0`
+
+Install the current release:
+```bash
+npm install -g contributor-report-cli@0.1.0
+```
+
+Release flow:
+- feature PRs add a changeset
+- merges to `main` open or update a release PR
+- merging the release PR updates npm and creates the GitHub release
+<!-- release:managed:end -->
+
 ## Requirements
 
 - Node.js 20+
@@ -78,9 +92,48 @@ By default the CLI writes outputs to `<repo>/contributor-reports/`.
 - JSON report: `contributor-report-<date-or-range>.json`
 - GitHub metadata cache when enabled: `contributor-github-pr-metadata-<from>_<to>.json`
 
+## How Code Quality Is Measured
+
+`qualityScore` is a heuristic, not a static-analysis result. The CLI currently uses only git history and test-file path heuristics, then clamps the final score to `0..100`.
+
+Current quality formula:
+
+```text
+60
++ min(test-related commits * 1.5, 18)
++ min(test files touched * 1.2, 14)
++ round(test touch ratio * 18)
+- min(feature commits without tests * 0.35, 26)
+- large change commits * 2
+```
+
+Signals used today:
+
+- Test-related commits: a commit touched at least one file that looks like a test
+- Test files touched: unique files matching `tests/`, `__tests__/`, `*.test.*`, or `*.unit.test.*`
+- Test touch ratio: `testFilesTouched / filesTouched`
+- Feature commits without tests: a commit changed non-test files and no test files
+- Large change commits: a single commit changed `400` LOC or more
+
+Overall ranking is also explicit:
+
+```text
+overallScore = throughputScore * 0.45 + qualityScore * 0.55
+```
+
+`throughputScore` is a separate delivery-volume heuristic based on commit count, churn, files touched, and inferred merge PR commits. Generated Markdown and JSON reports now include this methodology section so the score is inspectable at report time.
+
 ## Publish
 
-1. Run `npm login`
-2. Run `npm pack --dry-run`
-3. Run `npm publish --access public`
-4. Verify with `npm view contributor-report-cli`
+Maintainers should not publish manually in the normal flow.
+
+1. Add a changeset in the feature PR
+2. Merge the PR into `main`
+3. Review and merge the release PR created by GitHub Actions
+4. GitHub Actions publishes to npm and creates the GitHub release
+
+## Release Maintenance
+
+- Required GitHub secret: `NPM_TOKEN`
+- Versioning, changelog generation, README sync, and publish are handled by `changesets`
+- Run `npm run release:check` locally before merging release-related changes

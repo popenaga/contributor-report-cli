@@ -1,4 +1,4 @@
-export function renderMarkdownReport({ generatedAt, periodLabel, contributors, repoSlug }) {
+export function renderMarkdownReport({ generatedAt, periodLabel, contributors, repoSlug, scoringMethodology }) {
   const lines = [
     '# Contributor Evaluation Report',
     '',
@@ -16,6 +16,19 @@ export function renderMarkdownReport({ generatedAt, periodLabel, contributors, r
     lines.push(
       `| ${contributor.name} | ${contributor.commitCount} | ${contributor.mergePrCount} | ${contributor.githubPrCount ?? 0} | ${contributor.githubReviewCommentCount ?? 0} | ${contributor.githubConversationCommentCount ?? 0} | ${contributor.avgLeadTimeHours ?? '-'} | ${contributor.added} | ${contributor.deleted} | ${contributor.filesTouched} | ${contributor.testFilesTouched} | ${contributor.throughputScore} | ${contributor.qualityScore} | ${contributor.overallScore} |`
     )
+  }
+
+  if (scoringMethodology) {
+    lines.push('', '## Scoring Methodology', '')
+    lines.push(`- Overall formula: \`${scoringMethodology.overall.formula}\``)
+    lines.push(`- Throughput formula: \`${scoringMethodology.throughput.formula}\``)
+    lines.push(`- Quality formula: \`${scoringMethodology.quality.formula}\``)
+    lines.push(`- Large change threshold: ${scoringMethodology.thresholds.largeChangeLoc} LOC in a single commit`)
+    lines.push('', '### Quality Signals', '')
+
+    for (const signal of scoringMethodology.quality.signals) {
+      lines.push(`- ${signal.label}: ${signal.effect}`)
+    }
   }
 
   lines.push('', '## Detail Signals', '')

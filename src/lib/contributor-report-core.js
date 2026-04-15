@@ -2,10 +2,10 @@ import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { calculateScores, LARGE_CHANGE_THRESHOLD, scoringMethodology } from './contributor-report-scoring.js'
 
 const MAILMAP_PATTERN = /^(.*?) <([^>]+)> (.*?) <([^>]+)>$/
 const COMMIT_MARKER = '--COMMIT--'
-const LARGE_CHANGE_THRESHOLD = 400
 
 export function normalizeIdentity(name, email) {
   return `${String(name).normalize('NFC').trim().toLowerCase()} <${String(email).trim().toLowerCase()}>`
@@ -120,24 +120,7 @@ export function aggregateContributors(commits, mailmap = new Map()) {
 
   return [...contributorMap.values()]
     .map((item) => {
-      const filesTouched = item.filesTouchedSet.size
-      const testFilesTouched = item.testFilesTouchedSet.size
-      const testTouchRatio = filesTouched === 0 ? 0 : testFilesTouched / filesTouched
-      const throughputScore = Math.round(
-        item.commitCount * 4 +
-          Math.min(item.added + item.deleted, 1200) / 20 +
-          filesTouched * 1.5 +
-          item.mergePrCount * 3
-      )
-      const qualityBase =
-        60 +
-        Math.min(item.testRelatedCommitCount * 1.5, 18) +
-        Math.min(testFilesTouched * 1.2, 14) +
-        Math.round(testTouchRatio * 18) -
-        Math.min(item.featureCommitsWithoutTests * 0.35, 26) -
-        item.largeChangeCommits * 2
-      const qualityScore = Math.max(0, Math.min(100, Math.round(qualityBase)))
-      const overallScore = Math.round(throughputScore * 0.45 + qualityScore * 0.55)
+      const scores = calculateScores(item)
 
       return {
         name: item.name,
@@ -146,15 +129,15 @@ export function aggregateContributors(commits, mailmap = new Map()) {
         mergePrCount: item.mergePrCount,
         added: item.added,
         deleted: item.deleted,
-        filesTouched,
-        testFilesTouched,
+        filesTouched: scores.filesTouched,
+        testFilesTouched: scores.testFilesTouched,
         testRelatedCommitCount: item.testRelatedCommitCount,
         featureCommitsWithoutTests: item.featureCommitsWithoutTests,
         largeChangeCommits: item.largeChangeCommits,
-        testTouchRatio: Number(testTouchRatio.toFixed(2)),
-        throughputScore,
-        qualityScore,
-        overallScore
+        testTouchRatio: scores.testTouchRatio,
+        throughputScore: scores.throughputScore,
+        qualityScore: scores.qualityScore,
+        overallScore: scores.overallScore
       }
     })
     .sort((left, right) => right.overallScore - left.overallScore || right.commitCount - left.commitCount)
@@ -287,6 +270,7 @@ export function collectContributorReportData({
   return {
     generatedAt,
     periodLabel: periodOptions.periodLabel,
+    scoringMethodology,
     contributors
   }
 }
