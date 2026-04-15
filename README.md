@@ -2,6 +2,14 @@
 
 Generic CLI for measuring contributor throughput and code quality from any git repository, with optional GitHub PR enrichment through `gh`.
 
+Repository: https://github.com/popenaga/contributor-report-cli
+
+## Status
+
+- npm package name `contributor-report-cli` is currently available
+- GitHub repository is public and connected
+- npm publish has not been run yet
+
 ## Requirements
 
 - Node.js 20+
@@ -10,14 +18,15 @@ Generic CLI for measuring contributor throughput and code quality from any git r
 
 ## Install
 
-Local usage before publish:
+From local clone:
 
 ```bash
 npm install
 npm run smoke
+node ./bin/contributor-report.js --help
 ```
 
-Global usage after publish:
+After npm publish:
 
 ```bash
 npm install -g contributor-report-cli
@@ -69,10 +78,9 @@ By default the CLI writes outputs to `<repo>/contributor-reports/`.
 - JSON report: `contributor-report-<date-or-range>.json`
 - GitHub metadata cache when enabled: `contributor-github-pr-metadata-<from>_<to>.json`
 
-## Publish Checklist
+## Publish
 
-1. Create a public GitHub repository and push this folder.
-2. Decide whether `contributor-report-cli` is available on npm. If not, rename the package.
-3. Run `npm login`.
-4. Run `npm publish --access public`.
-5. Verify with `npm view contributor-report-cli`.
+1. Run `npm login`
+2. Run `npm pack --dry-run`
+3. Run `npm publish --access public`
+4. Verify with `npm view contributor-report-cli`
